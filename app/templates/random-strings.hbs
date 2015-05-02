@@ -1,2 +1,10 @@
 {{input type="text" value=model.contents}}
 <p>Length: {{length}}</p>
+{{sequences}}
+{{#each frequencyList in frequencies}}
+  <ul>
+  {{#each pair in frequencyList}}
+  <li>{{pair}}</li>
+  {{/each}}
+  </ul>
+{{/each}}
