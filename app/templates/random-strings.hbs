@@ -1,10 +1,12 @@
-{{input type="text" value=model.contents}}
+<h2>Type a random string of 1's and 0's</h2>
+{{input type="text" value=model.contents placeholder="e.g. 0010110"}}
 <p>Length: {{length}}</p>
-{{sequences}}
-{{#each frequencyList in frequencies}}
-  <ul>
-  {{#each pair in frequencyList}}
-  <li>{{pair}}</li>
-  {{/each}}
-  </ul>
+
+<h2>Frequencies:</h2>
+<p>The more random the string, the more even these graphs should be.</p>
+{{#each chartData in chartDataByLength}}
+  {{ember-chart type="Bar" data=chartData width=200 height=200}}
 {{/each}}
+
+<h2>Randomness Score:</h2>
+{{randomness}}

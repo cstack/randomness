@@ -1,14 +1,20 @@
 import Ember from 'ember';
 
+var MAX_LENGTH = 4;
+
 export default Ember.Controller.extend({
   length: (function() {
     return this.model.get('contents').length;
   }).property('model.contents'),
 
+  randomness: (function() {
+    return 0;
+  }).property(),
+
   sequences: (function() {
     var s = [];
-    for (var l=1; l<=4; l++) {
-      if (l == 1) {
+    for (var l=1; l<=MAX_LENGTH; l++) {
+      if (l === 1) {
         s[l] = ["0", "1"];
       } else {
         var seqs = [];
@@ -30,10 +36,11 @@ export default Ember.Controller.extend({
         f[key] = 0;
       }
       f[key] += 1;
-    }
+    };
     for (var l=1; l<=4; l++) {
-      for (var i=l; i<=s.length; i++)
-      increment(s.slice(i-l, i));
+      for (var i=l; i<=s.length; i++) {
+        increment(s.slice(i-l, i));
+      }
     }
     return f;
   }).property('model.contents'),
@@ -42,13 +49,38 @@ export default Ember.Controller.extend({
     var f = this.get('frequencyMap');
     var seqs = this.get('sequences');
     var result = [];
-    for (var l=1; l<=4; l++) {
-      var pairs = [];
+    for (var l=1; l<=MAX_LENGTH; l++) {
+      result[l] = [];
       for (var i=0; i<seqs[l].length; i++) {
-        pairs.push([seqs[l][i], f[seqs[l][i]]]);
+        var frequency = f[seqs[l][i]] || 0;
+        result[l].push(frequency);
       }
-      result.push(pairs);
     }
     return result;
   }).property('frequencyMap', 'sequences'),
+
+  chartData: function(xValues, yValues) {
+    return {
+      labels: xValues,
+      datasets: [
+        {
+          fillColor: "rgba(151,187,205,0.5)",
+          strokeColor: "rgba(151,187,205,0.8)",
+          highlightFill: "rgba(151,187,205,0.75)",
+          highlightStroke: "rgba(151,187,205,1)",
+          data: yValues
+        }
+      ]
+    }
+  },
+
+  chartDataByLength: (function() {
+    var sequences = this.get('sequences');
+    var frequencies = this.get('frequencies');
+    var result = [];
+    for (var l=1; l<=MAX_LENGTH; l++) {
+      result.push(this.chartData(sequences[l], frequencies[l]));
+    }
+    return result;
+  }).property('sequences', 'frequencies')
 });
