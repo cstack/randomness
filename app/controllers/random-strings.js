@@ -7,9 +7,26 @@ export default Ember.Controller.extend({
     return this.model.get('contents').length;
   }).property('model.contents'),
 
+  score: function(values) {
+    var min = Number.MAX_VALUE;
+    var max = 0;
+    for (var i=0; i<values.length; i++) {
+      var v = values[i];
+      min = Math.min(min, v);
+      max = Math.max(max, v);
+    }
+    debugger
+    return min * 1.0 / (max + 1);
+  },
+
   randomness: (function() {
-    return 0;
-  }).property(),
+    var frequencies = this.get('frequencies');
+    var result = 0;
+    for (var l=1; l<=MAX_LENGTH; l++) {
+      result += this.score(frequencies[l]);
+    }
+    return result / MAX_LENGTH;
+  }).property('frequencies'),
 
   sequences: (function() {
     var s = [];
