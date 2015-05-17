@@ -1,13 +1,14 @@
 import Ember from 'ember';
 
 var MAX_LENGTH = 4;
+var MINIMUM_LENGTH_FOR_SCORE = 100;
 
 export default Ember.Controller.extend({
   length: (function() {
     return this.model.get('contents').length;
   }).property('model.contents'),
 
-  score: function(values) {
+  scoreForFrequencies: function(values) {
     var min = Number.MAX_VALUE;
     var max = 0;
     for (var i=0; i<values.length; i++) {
@@ -15,18 +16,75 @@ export default Ember.Controller.extend({
       min = Math.min(min, v);
       max = Math.max(max, v);
     }
-    debugger
     return min * 1.0 / (max + 1);
   },
 
-  randomness: (function() {
-    var frequencies = this.get('frequencies');
+  scoreForString: function(s) {
+    var f = this.frequenciesForString(s);
     var result = 0;
     for (var l=1; l<=MAX_LENGTH; l++) {
-      result += this.score(frequencies[l]);
+      result += this.scoreForFrequencies(f[l]);
     }
     return result / MAX_LENGTH;
-  }).property('frequencies'),
+  },
+
+  frequenciesForString: function(s) {
+    var f = this.frequencyMapForString(s);
+    var seqs = this.get('sequences');
+    var result = [];
+    for (var l=1; l<=MAX_LENGTH; l++) {
+      result[l] = [];
+      for (var i=0; i<seqs[l].length; i++) {
+        var frequency = f[seqs[l][i]] || 0;
+        result[l].push(frequency);
+      }
+    }
+    return result;
+  },
+
+  frequencyMapForString: function(s) {
+    var f = {};
+    var increment = function(key) {
+      if (typeof f[key] === "undefined") {
+        f[key] = 0;
+      }
+      f[key] += 1;
+    };
+    for (var l=1; l<=MAX_LENGTH; l++) {
+      for (var i=l; i<=s.length; i++) {
+        increment(s.slice(i-l, i));
+      }
+    }
+    return f;
+  },
+
+  randomString: function(n) {
+    var s = "";
+    for (var i=0; i<n; i++) {
+      if (Math.random() < 0.5) {
+        s += "0";
+      } else {
+        s += "1"
+      }
+    }
+    return s;
+  },
+
+  minimumLength: (function() {
+    return MINIMUM_LENGTH_FOR_SCORE;
+  }).property(),
+
+  longEnough: (function() {
+    return this.get('length') >= this.get('minimumLength');
+  }).property('length', 'minimumLength'),
+
+  randomness: (function() {
+    return this.scoreForString(this.model.get('contents'));
+  }).property('model.contents'),
+
+  trueRandomness: (function() {
+    return this.scoreForString(this.randomString(this.get('length')));
+  }).property('length'),
 
   sequences: (function() {
     var s = [];
@@ -45,36 +103,9 @@ export default Ember.Controller.extend({
     return s;
   }).property(),
 
-  frequencyMap: (function() {
-    var s = this.model.get('contents');
-    var f = {};
-    var increment = function(key) {
-      if (typeof f[key] === "undefined") {
-        f[key] = 0;
-      }
-      f[key] += 1;
-    };
-    for (var l=1; l<=4; l++) {
-      for (var i=l; i<=s.length; i++) {
-        increment(s.slice(i-l, i));
-      }
-    }
-    return f;
-  }).property('model.contents'),
-
   frequencies: (function() {
-    var f = this.get('frequencyMap');
-    var seqs = this.get('sequences');
-    var result = [];
-    for (var l=1; l<=MAX_LENGTH; l++) {
-      result[l] = [];
-      for (var i=0; i<seqs[l].length; i++) {
-        var frequency = f[seqs[l][i]] || 0;
-        result[l].push(frequency);
-      }
-    }
-    return result;
-  }).property('frequencyMap', 'sequences'),
+    return this.frequenciesForString(this.get('model.contents'))
+  }).property('model.contents', 'sequences'),
 
   chartData: function(xValues, yValues) {
     return {

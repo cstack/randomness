@@ -1,12 +1,17 @@
-<h2>Type a random string of 1's and 0's</h2>
+<h2>Type {{minimumLength}} random 1's and 0's</h2>
 {{input type="text" value=model.contents placeholder="e.g. 0010110"}}
 <p>Length: {{length}}</p>
 
 <h2>Frequencies:</h2>
-<p>The more random the string, the more even these graphs should be.</p>
+<p>The more random your digits, the more even these graphs should be.</p>
 {{#each chartData in chartDataByLength}}
   {{ember-chart type="Bar" data=chartData width=200 height=200}}
 {{/each}}
 
-<h2>Randomness Score:</h2>
-{{formatted-percent randomness}}
+<h2>Your Randomness Score:</h2>
+{{#if longEnough}}
+  <h3>{{formatted-percent randomness}}</h3>
+  <p>Score of a true random string of length {{length}}: <b>{{formatted-percent trueRandomness}}</b></p>
+{{else}}
+  <p>You will get your score when you type at least {{minimumLength}} numbers.</p>
+{{/if}}
