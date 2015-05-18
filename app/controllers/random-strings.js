@@ -64,7 +64,7 @@ export default Ember.Controller.extend({
       if (Math.random() < 0.5) {
         s += "0";
       } else {
-        s += "1"
+        s += "1";
       }
     }
     return s;
@@ -104,7 +104,7 @@ export default Ember.Controller.extend({
   }).property(),
 
   frequencies: (function() {
-    return this.frequenciesForString(this.get('model.contents'))
+    return this.frequenciesForString(this.get('model.contents'));
   }).property('model.contents', 'sequences'),
 
   chartData: function(xValues, yValues) {
@@ -119,7 +119,7 @@ export default Ember.Controller.extend({
           data: yValues
         }
       ]
-    }
+    };
   },
 
   chartDataByLength: (function() {
