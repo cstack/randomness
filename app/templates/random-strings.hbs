@@ -1,4 +1,4 @@
-<h2>Type {{minimumLength}} random 1's and 0's</h2>
+<h2>Type {{minimumLength}} random ones and zeroes</h2>
 {{input type="text" value=model.contents placeholder="e.g. 0010110"}}
 <p>Length: {{length}}</p>
 
@@ -11,7 +11,7 @@
 <h2>Your Randomness Score:</h2>
 {{#if longEnough}}
   <h3>{{formatted-percent randomness}}</h3>
-  <p>Score of a true random string of length {{length}}: <b>{{formatted-percent trueRandomness}}</b></p>
+  <p>For comparison, I just randomly generated {{length}} ones and zeroes and got: <b>{{formatted-percent trueRandomness}}</b></p>
 {{else}}
   <p>You will get your score when you type at least {{minimumLength}} numbers.</p>
 {{/if}}
